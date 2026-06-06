@@ -263,7 +263,7 @@ async function payMobileMoney() {
     // ── Server can't reach AT (dev environment / blocked) ──
     if (data.blocked || data.error === 'AT_BLOCKED') {
       showStatus('momo-status','warning',
-        '⚠️ <strong>Africa\'s Talking is unreachable from this server.</strong><br><br>' +
+        '⚠️ <strong>Pawapay is unreachable from this server.</strong><br><br>' +
         '📌 <strong>Why this happens:</strong> Your current server\'s network blocks outgoing calls to africastalking.com.<br><br>' +
         '✅ <strong>Fix for production:</strong> Deploy to Render, Railway, or a VPS — AT works there.<br><br>' +
         '🧪 <strong>Want to test now?</strong> Switch to the <strong>Demo / Test</strong> tab above to place a test order.'
