@@ -2,7 +2,9 @@
   "name": "ecommerce",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "servergit add .
+git commit -m "fix start script to use server.js"
+git push.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
