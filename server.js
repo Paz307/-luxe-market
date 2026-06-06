@@ -28,7 +28,7 @@ app.use(flash());
 const routes = require('./routes/auth');
 app.use('/', routes);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n✦ Luxe Market running at http://localhost:${PORT}\n`);
 });
