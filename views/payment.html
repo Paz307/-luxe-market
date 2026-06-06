@@ -249,7 +249,7 @@ async function payMobileMoney() {
   const btn = document.getElementById('pay-momo-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Sending payment request…';
-  showStatus('momo-status','pending','⏳ Contacting Africa\'s Talking…');
+  showStatus('momo-status','pending','⏳ Contacting Pawapay…');
 
   try {
     const res  = await fetch('/payment/mobile-checkout', {
@@ -582,19 +582,7 @@ function payDemo() {
             <div class="status-box" id="paypal-status"></div>
           </div>
 
-          <!-- Demo / Test Section -->
-          <div class="pay-section" id="section-demo">
-            <div class="info-banner">
-              ℹ️ <strong>Demo / Test Mode</strong><br>
-              Use this to test the full order flow without a real payment. Your order will be placed and you can see it under "My Orders".<br>
-              <small>No money is charged. For real payments, switch to Mobile Money or PayPal above.</small>
-            </div>
-            <button class="btn-pay" style="background:linear-gradient(135deg,#6b7280,#374151)" onclick="payDemo()">
-              🧪 Place Demo Order (No Charge) →
-            </button>
-            <div class="status-box" id="demo-status"></div>
-          </div>
-
+          
           <!-- Hidden form submitted after successful payment -->
           <form id="place-order-form" action="/orders/place" method="POST" style="display:none">
             <input type="hidden" name="address"         id="form-address">
