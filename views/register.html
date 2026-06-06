@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Luxe Market</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+<div class="auth-wrapper">
+
+  <!-- ══ SLIDING BRAND PANEL ══ -->
+  <div class="auth-brand">
+    <div class="brand-ticker-top">
+      <div class="brand-ticker-inner">
+        ✦ Join Thousands of Shoppers &nbsp;&nbsp;&nbsp; Summer Sale — Up to 50% Off &nbsp;&nbsp;&nbsp; Free Shipping Over $50 &nbsp;&nbsp;&nbsp; Zero Seller Listing Fees &nbsp;&nbsp;&nbsp; Secure Payments &nbsp;&nbsp;&nbsp; 1000+ Products &nbsp;&nbsp;&nbsp;
+        ✦ Join Thousands of Shoppers &nbsp;&nbsp;&nbsp; Summer Sale — Up to 50% Off &nbsp;&nbsp;&nbsp; Free Shipping Over $50 &nbsp;&nbsp;&nbsp; Zero Seller Listing Fees &nbsp;&nbsp;&nbsp; Secure Payments &nbsp;&nbsp;&nbsp; 1000+ Products &nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+
+    <div class="slide-show">
+
+      <!-- Slide 1: Photo -->
+      <div class="slide slide-1 active">
+        <div class="slide-hero-frame">
+          <img src="/hero.png" alt="Shop online">
+          <span class="promo-badge">JOIN FREE</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Shop Premium.<br>Live Better.</div>
+          <div class="slide-desc">Discover curated products from verified sellers. Buy with confidence, sell with ease.</div>
+          <div class="slide-cta">Create Free Account →</div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Summer sale -->
+      <div class="slide slide-2">
+        <div class="slide-hero-frame" style="background:linear-gradient(135deg,#1a6b63,#3aada4)">
+          <div class="frame-emoji">☀️</div>
+          <span class="promo-badge">SALE</span>
+          <span class="discount-ribbon">50% Off</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Summer Sale<br>Is Here!</div>
+          <div class="slide-desc">Massive discounts on Electronics, Fashion, Home, Sports & Beauty. Limited time only!</div>
+          <div class="slide-cta">Shop the Sale →</div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Sell with us -->
+      <div class="slide slide-3">
+        <div class="slide-hero-frame" style="background:linear-gradient(135deg,#c07060,#FDBCB4)">
+          <div class="frame-emoji">🏪</div>
+          <span class="promo-badge">SELLERS</span>
+          <span class="discount-ribbon">Zero Fees</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Start Selling.<br>Earn More.</div>
+          <div class="slide-desc">List your products for free and reach thousands of buyers across the platform.</div>
+          <div class="slide-cta">Become a Seller →</div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Gold deals -->
+      <div class="slide slide-4">
+        <div class="slide-hero-frame" style="background:linear-gradient(135deg,#8a7820,#DDD06A)">
+          <div class="frame-emoji">🎯</div>
+          <span class="promo-badge">HOT</span>
+          <span class="discount-ribbon">Trending</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Trending Now<br>This Week</div>
+          <div class="slide-desc">The most popular products right now — shoes, tech, beauty and more.</div>
+          <div class="slide-cta">View Trending →</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="slide-dots">
+      <button class="slide-dot active" onclick="goSlide(0)"></button>
+      <button class="slide-dot" onclick="goSlide(1)"></button>
+      <button class="slide-dot" onclick="goSlide(2)"></button>
+      <button class="slide-dot" onclick="goSlide(3)"></button>
+    </div>
+  </div>
+
+  <!-- ══ REGISTER FORM ══ -->
+  <div class="auth-panel">
+    <div class="auth-card">
+      <h1>Create account</h1>
+      <p class="subtitle">Already have one? <a href="/login">Sign in</a></p>
+
+      <%if(typeof errors!=='undefined'&&errors.length>0){%><%errors.forEach(e=>{%><div class="flash error">⚠ <%=e.msg%></div><%});%><%}%>
+      <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+      <form action="/register" method="POST" enctype="multipart/form-data" id="reg-form">
+
+        <div class="avatar-upload" onclick="document.getElementById('profile_picture').click()">
+          <div class="avatar-preview" id="avatar-preview">🧑</div>
+          <div class="avatar-info">
+            <strong>Upload Profile Photo</strong>
+            <p>Click to browse · JPG, PNG · Max 2MB</p>
+          </div>
+          <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display:none" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Full Name</label>
+            <div class="input-wrap"><span class="icon">👤</span>
+              <input type="text" name="full_name" placeholder="Jane Doe" value="<%=typeof formData!=='undefined'?formData.full_name||'':''%>" required>
+            </div>
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <div class="input-wrap"><span class="icon">✉</span>
+              <input type="email" name="email" placeholder="jane@example.com" value="<%=typeof formData!=='undefined'?formData.email||'':''%>" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="field"><label>I am joining as</label></div>
+        <div class="role-selector">
+          <div class="role-option"><input type="radio" name="role" id="role-buyer" value="buyer" checked><label for="role-buyer"><span class="role-icon">🛍️</span>Buyer</label></div>
+          <div class="role-option"><input type="radio" name="role" id="role-seller" value="seller"><label for="role-seller"><span class="role-icon">🏪</span>Seller</label></div>
+          <div class="role-option"><input type="radio" name="role" id="role-admin" value="admin"><label for="role-admin"><span class="role-icon">⚙️</span>Admin</label></div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap"><span class="icon">🔒</span>
+            <input type="password" name="password" id="password" placeholder="Create a strong password" required>
+          </div>
+          <div class="pwd-strength">
+            <div class="pwd-bar"><div class="pwd-bar-fill"></div></div>
+            <div class="pwd-rules">
+              <span class="pwd-rule" id="rule-length"><span class="check">○</span> 8+ characters</span>
+              <span class="pwd-rule" id="rule-upper"><span class="check">○</span> Uppercase letter</span>
+              <span class="pwd-rule" id="rule-lower"><span class="check">○</span> Lowercase letter</span>
+              <span class="pwd-rule" id="rule-number"><span class="check">○</span> Number</span>
+              <span class="pwd-rule" id="rule-special"><span class="check">○</span> Special character</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="input-wrap"><span class="icon">🔒</span>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat your password" required>
+          </div>
+          <div id="confirm-feedback" style="font-size:0.87rem;margin-top:0.4rem;font-weight:600"></div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="reg-btn">Create my account →</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  // ── Slideshow ──
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dots   = document.querySelectorAll('.slide-dot');
+  function goSlide(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+  setInterval(() => goSlide((current + 1) % slides.length), 4500);
+
+  // ── Send welcome email on submit ──
+  document.getElementById('reg-form').addEventListener('submit', function(e) {
+    const toEmail = this.querySelector('input[name=email]').value.trim();
+    const toName  = this.querySelector('input[name=full_name]').value.trim();
+    if (toEmail && toName) {
+      // Small delay to let form submit first
+      setTimeout(() => sendWelcomeEmail(toEmail, toName), 300);
+    }
+  });
+</script>
+</body>
+</html>

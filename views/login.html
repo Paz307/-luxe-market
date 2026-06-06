@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Luxe Market</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-wrapper">
+
+  <!-- ══ SLIDING BRAND PANEL ══ -->
+  <div class="auth-brand">
+    <div class="brand-ticker-top">
+      <div class="brand-ticker-inner">
+        ✦ Today's Deals Are Live &nbsp;&nbsp;&nbsp; Summer Sale Up To 50% Off &nbsp;&nbsp;&nbsp; Free Shipping Over $50 &nbsp;&nbsp;&nbsp; New Products Daily &nbsp;&nbsp;&nbsp; Fast & Secure Checkout &nbsp;&nbsp;&nbsp; Shop Premium · Sell Global &nbsp;&nbsp;&nbsp;
+        ✦ Today's Deals Are Live &nbsp;&nbsp;&nbsp; Summer Sale Up To 50% Off &nbsp;&nbsp;&nbsp; Free Shipping Over $50 &nbsp;&nbsp;&nbsp; New Products Daily &nbsp;&nbsp;&nbsp; Fast & Secure Checkout &nbsp;&nbsp;&nbsp; Shop Premium · Sell Global &nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+
+    <div class="slide-show">
+
+      <!-- Slide 1: Store photo background -->
+      <div class="slide slide-1 active" style="position:relative;overflow:hidden">
+        <img src="/store-bg.jpg" alt="Store" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0">
+        <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(20,80,75,0.78),rgba(58,173,164,0.60));z-index:1"></div>
+        <div class="slide-hero-frame" style="position:relative;z-index:2;background:transparent">
+          <span class="promo-badge">WELCOME BACK</span>
+        </div>
+        <div class="slide-content" style="position:relative;z-index:2">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Your Cart<br>Is Waiting</div>
+          <div class="slide-desc">Continue shopping from where you left off. New deals are added every day.</div>
+          <div class="slide-cta">Sign In to Shop →</div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Flash Sale -->
+      <div class="slide slide-2">
+        <div class="slide-hero-frame" style="background:linear-gradient(135deg,#1a6b63,#3aada4)">
+          <div class="frame-emoji">⚡</div>
+          <span class="promo-badge">FLASH SALE</span>
+          <span class="discount-ribbon">Up to 60% Off</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Today's Flash<br>Sale Is Live!</div>
+          <div class="slide-desc">Limited-time deals on Electronics, Fashion & Beauty. Don't miss out!</div>
+          <div class="slide-cta">Shop the Sale →</div>
+        </div>
+      </div>
+
+      <!-- Slide 3: New arrivals -->
+      <div class="slide slide-3">
+        <div class="slide-hero-frame" style="background:linear-gradient(135deg,#c07060,#FDBCB4)">
+          <div class="frame-emoji">🎁</div>
+          <span class="promo-badge">NEW IN</span>
+          <span class="discount-ribbon">Just Arrived</span>
+        </div>
+        <div class="slide-content">
+          <div class="slide-brand">Luxe.Market</div>
+          <div class="slide-title">Fresh Products<br>Just Dropped</div>
+          <div class="slide-desc">Hundreds of new listings from verified sellers. Electronics, Shoes, Clothes & more.</div>
+          <div class="slide-cta">Browse New Arrivals →</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="slide-dots">
+      <button class="slide-dot active" onclick="goSlide(0)"></button>
+      <button class="slide-dot" onclick="goSlide(1)"></button>
+      <button class="slide-dot" onclick="goSlide(2)"></button>
+    </div>
+  </div>
+
+  <!-- ══ LOGIN FORM ══ -->
+  <div class="auth-panel">
+    <div class="auth-card">
+      <h1>Sign in</h1>
+      <p class="subtitle">New here? <a href="/register">Create an account</a></p>
+
+      <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+      <%if(typeof reg_email!=="undefined"&&reg_email){%><div id="reg-success-meta" data-email="<%=reg_email%>" data-name="<%=reg_name%>" style="display:none"></div><%}%>
+      <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+
+      <form action="/login" method="POST">
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="icon">✉</span>
+            <input type="email" name="email" placeholder="your@email.com" required autofocus>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="icon">🔒</span>
+            <input type="password" name="password" placeholder="Your password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">Sign in →</button>
+        <div class="form-divider">or</div>
+        <div style="text-align:center">
+          <a href="/forgot-password" style="font-size:0.97rem;color:var(--teal-dark);text-decoration:none;font-weight:600">Forgot your password?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dots   = document.querySelectorAll('.slide-dot');
+  function goSlide(n) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+  setInterval(() => goSlide((current + 1) % slides.length), 4500);
+</script>
+</body>
+</html>

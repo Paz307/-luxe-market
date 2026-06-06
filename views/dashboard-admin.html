@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Luxe Market</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-admin">Administrator</div>
+    <div class="sidebar-section-label">Management</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard" class="active"><span class="nav-icon">📊</span>Overview</a></li>
+      <li><a href="/admin/users"><span class="nav-icon">👥</span>All Users</a></li>
+      <li><a href="/admin/expiring"><span class="nav-icon">⏰</span>Expiring Passwords <%if(expiringCount>0){%><span class="nav-badge"><%=expiringCount%></span><%}%></a></li>
+      <li><a href="/admin/add-user"><span class="nav-icon">➕</span>Add User</a></li>
+    </ul>
+    <div class="sidebar-section-label">Products</div>
+    <ul class="sidebar-nav">
+      <li><a href="/admin/add-product"><span class="nav-icon">📦</span>Add Product</a></li>
+      <li><a href="/admin/products"><span class="nav-icon">🏷️</span>All Products</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications <%if(unreadCount>0){%><span class="nav-badge"><%=unreadCount%></span><%}%></a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>⚙️<%}%></div>
+      <div class="sidebar-user-info">
+        <div class="name"><%=user.full_name%></div>
+        <div class="email"><%=user.email%></div>
+      </div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="marquee-wrapper"><div class="marquee-track">
+      <span>Admin Dashboard</span><span>Manage Users</span><span>Monitor Activity</span><span>Luxe Market</span><span>Security Center</span><span>Platform Overview</span>
+      <span>Admin Dashboard</span><span>Manage Users</span><span>Monitor Activity</span><span>Luxe Market</span><span>Security Center</span><span>Platform Overview</span>
+    </div></div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Admin Dashboard</h1>
+        <p>Full platform overview — <%=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})%></p>
+      </div>
+      <a href="/admin/add-user" class="btn-secondary">+ Add User</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value"><%=stats.total%></div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-icon">⚙️</div><div class="stat-value"><%=stats.admins%></div><div class="stat-label">Admins</div></div>
+      <div class="stat-card"><div class="stat-icon">🏪</div><div class="stat-value"><%=stats.sellers%></div><div class="stat-label">Sellers</div></div>
+      <div class="stat-card"><div class="stat-icon">🛍️</div><div class="stat-value"><%=stats.buyers%></div><div class="stat-label">Buyers</div></div>
+      <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-value"><%=stats.products%></div><div class="stat-label">Products</div></div>
+      <div class="stat-card"><div class="stat-icon">🛒</div><div class="stat-value"><%=stats.orders%></div><div class="stat-label">Orders</div></div>
+      <div class="stat-card" style="border-color:rgba(201,168,76,0.25)"><div class="stat-icon">⏰</div><div class="stat-value text-gold"><%=expiringCount%></div><div class="stat-label">Expiring Soon</div></div>
+      <div class="stat-card"><div class="stat-icon">🚫</div><div class="stat-value"><%=stats.disabled%></div><div class="stat-label">Disabled</div></div>
+    </div>
+
+    <%if(expiringUsers.length>0){%>
+    <div class="card">
+      <div class="card-header">
+        <h3>⏰ Passwords Expiring Soon</h3>
+        <a href="/admin/expiring" class="btn-sm btn-gold">View All</a>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="data-table">
+          <thead><tr><th>User</th><th>Role</th><th>Days Left</th><th>Last Login</th></tr></thead>
+          <tbody>
+            <%expiringUsers.slice(0,4).forEach(u=>{%>
+            <tr>
+              <td><div class="user-cell">
+                <div class="mini-avatar"><%if(u.profile_picture){%><img src="/uploads/<%=u.profile_picture%>" alt=""><%}else{%>👤<%}%></div>
+                <div><div class="user-name"><%=u.full_name%></div><div class="user-email"><%=u.email%></div></div>
+              </div></td>
+              <td><span class="role-pill <%=u.role%>"><%=u.role%></span></td>
+              <td><span style="color:var(--gold);font-weight:700"><%=u.daysLeft%> days</span></td>
+              <td class="text-sm"><%=u.last_login?new Date(u.last_login).toLocaleDateString():'Never'%></td>
+            </tr>
+            <%});%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%}%>
+
+    <div class="card">
+      <div class="card-header"><h3>All Users</h3><span class="text-sm"><%=stats.total%> total</span></div>
+      <div class="card-body" style="padding:0">
+        <table class="data-table">
+          <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+          <tbody>
+            <%allUsers.forEach(u=>{%>
+            <tr>
+              <td><div class="user-cell">
+                <div class="mini-avatar"><%if(u.profile_picture){%><img src="/uploads/<%=u.profile_picture%>" alt=""><%}else{%><%=u.role==='admin'?'⚙️':u.role==='seller'?'🏪':'🛍️'%><%}%></div>
+                <div><div class="user-name"><%=u.full_name%></div><div class="user-email"><%=u.email%></div></div>
+              </div></td>
+              <td><span class="role-pill <%=u.role%>"><%=u.role%></span></td>
+              <td><span class="role-pill <%=u.disabled?'disabled':'seller'%>"><%=u.disabled?'Disabled':'Active'%></span></td>
+              <td class="text-sm"><%=u.last_login?new Date(u.last_login).toLocaleDateString():'Never'%></td>
+              <td>
+                <%if(u.id!==user.id){%>
+                  <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+                    <%if(!u.disabled){%>
+                      <form action="/admin/disable-user" method="POST" style="display:inline">
+                        <input type="hidden" name="userId" value="<%=u.id%>">
+                        <button class="btn-sm btn-danger" onclick="return confirm('Disable this user?')">🚫 Disable</button>
+                      </form>
+                    <%}else{%>
+                      <form action="/admin/enable-user" method="POST" style="display:inline">
+                        <input type="hidden" name="userId" value="<%=u.id%>">
+                        <button class="btn-sm btn-gold">✓ Enable</button>
+                      </form>
+                    <%}%>
+                    <form action="/admin/delete-user" method="POST" style="display:inline">
+                      <input type="hidden" name="userId" value="<%=u.id%>">
+                      <button class="btn-sm btn-danger" onclick="return confirm('Permanently delete this user?')">🗑 Delete</button>
+                    </form>
+                  </div>
+                <%}else{%><span class="text-sm">(you)</span><%}%>
+              </td>
+            </tr>
+            <%});%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body>
+</html>

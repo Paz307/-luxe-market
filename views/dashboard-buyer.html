@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Shop — Luxe Market</title><link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-buyer">Buyer</div>
+    <div class="sidebar-section-label">Shop</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard" class="active"><span class="nav-icon">🏠</span>Browse Shop</a></li>
+      <li><a href="/cart"><span class="nav-icon">🛒</span>My Cart <%if(cartCount>0){%><span class="nav-badge"><%=cartCount%></span><%}%></a></li>
+      <li><a href="/orders"><span class="nav-icon">📋</span>My Orders</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications <%if(unreadCount>0){%><span class="nav-badge"><%=unreadCount%></span><%}%></a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>🛍️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="marquee-wrapper"><div class="marquee-track">
+      <span>Free Shipping Over $50</span><span>Premium Quality</span><span>Secure Checkout</span><span>New Arrivals Daily</span><span>Luxe Market</span><span>Shop Premium</span>
+      <span>Free Shipping Over $50</span><span>Premium Quality</span><span>Secure Checkout</span><span>New Arrivals Daily</span><span>Luxe Market</span><span>Shop Premium</span>
+    </div></div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <div class="page-header">
+      <div class="page-header-left"><h1>Browse Shop</h1><p>Discover premium products from our sellers.</p></div>
+      <form action="/dashboard" method="GET" style="display:flex;gap:0.5rem;align-items:center">
+        <div class="search-bar" style="min-width:240px">
+          <span>🔍</span>
+          <input type="text" name="q" placeholder="Search products..." value="<%=search||''%>">
+        </div>
+        <button type="submit" class="btn-secondary" style="padding:0.65rem 1rem">Search</button>
+      </form>
+    </div>
+
+    <%if(products.length===0){%>
+    <div class="empty-state"><div class="empty-icon">🛍️</div><h4>No products found</h4><p><%=search?'Try a different search term.':'Check back soon — sellers are adding products.'%></p></div>
+    <%}else{%>
+    <div class="product-grid">
+      <%products.forEach(p=>{%>
+      <div class="product-card">
+        <div class="product-img"><%if(p.image){%><img src="/uploads/<%=p.image%>" alt="<%=p.name%>"><%}else{%>📦<%}%></div>
+        <div class="product-body">
+          <div class="product-name"><%=p.name%></div>
+          <div class="product-desc"><%=p.description||'Quality product from our store.'%></div>
+          <div class="product-price">$<%=p.price%></div>
+          <div class="product-seller">by <%=p.sellerName||'Seller'%> · <%=p.category||'General'%></div>
+        </div>
+        <div class="product-footer">
+          <form action="/cart/add" method="POST" style="flex:1">
+            <input type="hidden" name="productId" value="<%=p.id%>">
+            <button type="submit" class="btn-sm btn-gold" style="width:100%">🛒 Add to Cart</button>
+          </form>
+        </div>
+      </div>
+      <%});%>
+    </div>
+    <%}%>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body></html>

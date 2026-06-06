@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>All Products — Admin — Luxe Market</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-admin">Administrator</div>
+    <div class="sidebar-section-label">Management</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">📊</span>Overview</a></li>
+      <li><a href="/admin/users"><span class="nav-icon">👥</span>All Users</a></li>
+      <li><a href="/admin/expiring"><span class="nav-icon">⏰</span>Expiring Passwords</a></li>
+      <li><a href="/admin/add-user"><span class="nav-icon">➕</span>Add User</a></li>
+    </ul>
+    <div class="sidebar-section-label">Products</div>
+    <ul class="sidebar-nav">
+      <li><a href="/admin/add-product"><span class="nav-icon">📦</span>Add Product</a></li>
+      <li><a href="/admin/products" class="active"><span class="nav-icon">🏷️</span>All Products</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications <%if(unreadCount>0){%><span class="nav-badge"><%=unreadCount%></span><%}%></a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>⚙️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="marquee-wrapper"><div class="marquee-track">
+      <span>Admin Control</span><span>All Products</span><span>Manage Listings</span><span>Luxe Market</span>
+      <span>Admin Control</span><span>All Products</span><span>Manage Listings</span><span>Luxe Market</span>
+    </div></div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>All Products</h1>
+        <p><%=allProducts.length%> product<%=allProducts.length!==1?'s':''%> listed on the marketplace</p>
+      </div>
+      <a href="/admin/add-product" class="btn-primary">+ Add Product</a>
+    </div>
+
+    <%if(allProducts.length===0){%>
+    <div class="empty-state"><div class="empty-icon">📦</div><h4>No products yet</h4><p>Add the first product to the marketplace.</p><br><a href="/admin/add-product" class="btn-primary">+ Add Product</a></div>
+    <%}else{%>
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Seller</th>
+              <th>Added</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%allProducts.forEach(p=>{%>
+            <tr>
+              <td>
+                <%if(p.image){%>
+                <img src="/uploads/<%=p.image%>" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border2)">
+                <%}else{%>
+                <div style="width:48px;height:48px;background:var(--teal-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📦</div>
+                <%}%>
+              </td>
+              <td><strong style="color:var(--ink)"><%=p.name%></strong><%if(p.description){%><div style="font-size:0.8rem;color:var(--muted);margin-top:2px"><%=p.description.substring(0,60)%><%=p.description.length>60?'...':''%></div><%}%></td>
+              <td><strong class="text-gold">$<%=parseFloat(p.price).toFixed(2)%></strong></td>
+              <td><span class="badge" style="background:var(--teal-bg);color:var(--teal-dark);font-size:0.8rem;padding:3px 10px;border-radius:20px"><%=p.category||'General'%></span></td>
+              <td style="color:var(--muted)"><%=p.sellerName%></td>
+              <td style="color:var(--muted);font-size:0.85rem"><%=new Date(p.created_at).toLocaleDateString()%></td>
+              <td>
+                <div style="display:flex;gap:0.5rem;align-items:center">
+                  <a href="/seller/edit-product/<%=p.id%>" class="btn-secondary" style="font-size:0.8rem;padding:5px 12px">✏️ Edit</a>
+                  <form action="/admin/delete-product/<%=p.id%>" method="POST" onsubmit="return confirm('Delete this product permanently?')">
+                    <button type="submit" class="btn-danger" style="font-size:0.8rem;padding:5px 12px;background:rgba(217,79,67,0.12);color:#d94f43;border:1.5px solid rgba(217,79,67,0.3);border-radius:8px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:600">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <%});%>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%}%>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body>
+</html>

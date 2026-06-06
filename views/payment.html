@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Checkout — Luxe Market</title>
+  <link rel="stylesheet" href="/css/style.css">
+<style>
+.payment-wrapper { max-width:700px; margin:0 auto; }
+.payment-card { background:rgba(255,255,255,0.97); border:2px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden; box-shadow:0 8px 40px rgba(58,173,164,0.18); }
+.payment-header { background:linear-gradient(135deg,#2a8f87,#3aada4); padding:2rem 2.2rem 1.8rem; color:#fff; }
+.payment-header h2 { font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:700; margin-bottom:0.2rem; }
+.payment-header p { opacity:.85; font-size:.95rem; }
+.payment-total-badge { background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.35); border-radius:14px; padding:.9rem 1.4rem; margin-top:1.2rem; display:inline-block; }
+.payment-total-badge .label { font-size:.78rem; opacity:.8; text-transform:uppercase; letter-spacing:.06em; }
+.payment-total-badge .amount { font-size:2.2rem; font-weight:800; font-family:'Playfair Display',serif; line-height:1; }
+.payment-body { padding:2rem 2.2rem; }
+.method-tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.8rem; margin-bottom:1.8rem; }
+.method-tab { border:2.5px solid var(--border2); border-radius:var(--radius); padding:1.1rem .8rem; background:#fff; cursor:pointer; text-align:center; transition:all .2s; }
+.method-tab:hover, .method-tab.active { border-color:var(--teal-dark); background:var(--teal-bg); transform:translateY(-2px); box-shadow:0 4px 16px rgba(58,173,164,.18); }
+.method-tab .mt-icon { font-size:1.8rem; margin-bottom:.4rem; }
+.method-tab .mt-name { font-weight:700; font-size:.88rem; color:var(--ink); }
+.method-tab .mt-sub  { font-size:.75rem; color:var(--muted); }
+.pay-section { display:none; }
+.pay-section.visible { display:block; }
+.status-box { border-radius:var(--radius); padding:1rem 1.2rem; margin-top:1rem; font-size:.93rem; font-weight:500; display:none; line-height:1.6; }
+.status-box.show { display:block; }
+.status-box.info    { background:rgba(58,173,164,.1);  border:1.5px solid rgba(58,173,164,.3);  color:#1a6b63; }
+.status-box.pending { background:rgba(221,208,106,.15); border:1.5px solid rgba(184,168,48,.4);  color:#7a6e10; }
+.status-box.success { background:rgba(46,158,122,.12); border:1.5px solid rgba(46,158,122,.35); color:#1e7a5a; }
+.status-box.error   { background:rgba(217,79,67,.09);  border:1.5px solid rgba(217,79,67,.3);   color:#b03328; }
+.status-box.warning { background:rgba(251,191,36,.1);  border:1.5px solid rgba(251,191,36,.4);  color:#92640a; }
+.btn-pay { width:100%; padding:1rem; background:linear-gradient(135deg,var(--teal-dark),#1a6b63); color:#fff; border:none; border-radius:var(--radius); font-family:'Outfit',sans-serif; font-size:1.05rem; font-weight:700; cursor:pointer; transition:all .2s; margin-top:1rem; box-shadow:0 4px 16px rgba(58,173,164,.3); }
+.btn-pay:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(58,173,164,.4); }
+.btn-pay:disabled { opacity:.6; cursor:not-allowed; }
+.btn-demo { background:transparent; border:2px solid var(--teal-dark); color:var(--teal-dark); padding:.75rem 1.5rem; border-radius:var(--radius); font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:700; cursor:pointer; width:100%; margin-top:.6rem; transition:all .2s; }
+.btn-demo:hover { background:var(--teal-bg); }
+.order-mini { background:var(--teal-bg); border:1.5px solid var(--border2); border-radius:var(--radius); padding:1rem 1.2rem; margin-bottom:1.5rem; }
+.order-mini .row { display:flex; justify-content:space-between; font-size:.88rem; padding:.22rem 0; color:var(--ink2); }
+.order-mini .row.total { border-top:1.5px solid var(--border); margin-top:.5rem; padding-top:.6rem; font-weight:700; font-size:1rem; color:var(--ink); }
+.spinner { display:inline-block; width:15px; height:15px; border:2.5px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; vertical-align:middle; margin-right:5px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.info-banner { background:rgba(251,191,36,.1); border:1.5px solid rgba(251,191,36,.35); border-radius:10px; padding:.9rem 1.1rem; font-size:.85rem; color:#7a5a00; margin-bottom:1.2rem; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-buyer">Buyer</div>
+    <div class="sidebar-section-label">Shop</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">🏠</span>Browse Shop</a></li>
+      <li><a href="/cart"><span class="nav-icon">🛒</span>My Cart</a></li>
+      <li><a href="/orders"><span class="nav-icon">📋</span>My Orders</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>🛍️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="marquee-wrapper"><div class="marquee-track">
+      <span>Secure Checkout</span><span>Mobile Money</span><span>Fast & Safe</span><span>Luxe Market</span><span>Protected Purchase</span>
+      <span>Secure Checkout</span><span>Mobile Money</span><span>Fast & Safe</span><span>Luxe Market</span><span>Protected Purchase</span>
+    </div></div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <div class="page-header">
+      <div class="page-header-left"><h1>💳 Secure Checkout</h1><p>Complete payment to place your order</p></div>
+      <a href="/cart" class="btn-secondary">← Back to Cart</a>
+    </div>
+
+    <div class="payment-wrapper">
+      <div class="payment-card">
+
+        <div class="payment-header">
+          <h2>Payment</h2>
+          <p>Choose your payment method and complete your order</p>
+          <div class="payment-total-badge">
+            <div class="label">Order Total</div>
+            <div class="amount">$<%=total%></div>
+          </div>
+        </div>
+
+        <div class="payment-body">
+
+          <!-- Order Summary -->
+          <div class="order-mini">
+            <div style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Order Summary</div>
+            <%cartItems.forEach(item=>{%>
+            <div class="row"><span><%=item.name%> ×<%=item.quantity%></span><span>$<%=(item.price*item.quantity).toFixed(2)%></span></div>
+            <%});%>
+            <div class="row total"><span>Total</span><span>$<%=total%></span></div>
+          </div>
+
+          <!-- Delivery Address -->
+          <div class="field" style="margin-bottom:1.5rem">
+            <label>Delivery Address</label>
+            <div class="input-wrap">
+              <span class="icon">📍</span>
+              <input type="text" id="delivery-address" placeholder="Enter your full delivery address" required>
+            </div>
+          </div>
+
+          <!-- Payment Method Tabs -->
+          <div style="margin-bottom:1.5rem">
+            <label style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.8rem">Payment Method</label>
+            <div class="method-tabs">
+              <div class="method-tab active" onclick="selectTab('momo',this)">
+                <div class="mt-icon">📱</div>
+                <div class="mt-name">Mobile Money</div>
+                <div class="mt-sub">MTN · Airtel · M-Pesa</div>
+              </div>
+              <div class="method-tab" onclick="selectTab('paypal',this)">
+                <div class="mt-icon">🅿️</div>
+                <div class="mt-name">PayPal</div>
+                <div class="mt-sub">Pay with PayPal</div>
+              </div>
+              <div class="method-tab" onclick="selectTab('demo',this)">
+                <div class="mt-icon">🧪</div>
+                <div class="mt-name">Demo / Test</div>
+                <div class="mt-sub">Test order flow</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Money Section -->
+          <div class="pay-section visible" id="section-momo">
+            <div class="field">
+              <label>Phone Number</label>
+              <div class="input-wrap">
+                <span class="icon">📞</span>
+                <input type="tel" id="phone-number" placeholder="+250788000000  (international format)">
+              </div>
+            </div>
+            <div class="field">
+              <label>Mobile Network</label>
+              <div class="input-wrap">
+                <span class="icon">📶</span>
+                <select id="network-select" style="padding-left:2.9rem">
+                  <option value="MTN" selected>MTN Mobile Money (Rwanda/Uganda)</option>
+                  <option value="Airtel">Airtel Money (Rwanda/Uganda)</option>
+                  <option value="Mpesa">M-Pesa (Kenya)</option>
+                  <option value="Tigo">Tigo Pesa (Tanzania)</option>
+                  <option value="Vodacom">Vodacom M-Pesa (Tanzania)</option>
+                </select>
+              </div>
+            </div>
+            <div style="background:rgba(58,173,164,.07);border:1.5px solid rgba(58,173,164,.2);border-radius:10px;padding:.9rem 1.1rem;font-size:.87rem;color:var(--muted);margin:.5rem 0">
+              💡 You will receive a prompt on your phone. Enter your PIN to confirm.
+            </div>
+            <button class="btn-pay" id="pay-momo-btn" onclick="payMobileMoney()">
+              📱 Pay $<%=total%> with Mobile Money →
+            </button>
+            <div class="status-box" id="momo-status"></div>
+          </div>
+
+          <!-- PayPal Section -->
+          <div class="pay-section" id="section-paypal">
+            <div style="background:rgba(0,48,135,.05);border:1.5px solid rgba(0,48,135,.15);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem">
+              <div style="font-size:3rem;margin-bottom:.5rem">🅿️</div>
+              <div style="font-weight:700;color:#003087;font-size:1.05rem;margin-bottom:.3rem">Pay with PayPal</div>
+              <div style="font-size:.87rem;color:var(--muted)">You'll complete payment securely via PayPal.</div>
+            </div>
+            <button class="btn-pay" style="background:linear-gradient(135deg,#003087,#009cde)" onclick="payPayPal()">
+              🅿️ Pay $<%=total%> with PayPal →
+            </button>
+            <div class="status-box" id="paypal-status"></div>
+          </div>
+
+          <!-- Demo / Test Section -->
+          <div class="pay-section" id="section-demo">
+            <div class="info-banner">
+              ℹ️ <strong>Demo / Test Mode</strong><br>
+              Use this to test the full order flow without a real payment. Your order will be placed and you can see it under "My Orders".<br>
+              <small>No money is charged. For real payments, switch to Mobile Money or PayPal above.</small>
+            </div>
+            <button class="btn-pay" style="background:linear-gradient(135deg,#6b7280,#374151)" onclick="payDemo()">
+              🧪 Place Demo Order (No Charge) →
+            </button>
+            <div class="status-box" id="demo-status"></div>
+          </div>
+
+          <!-- Hidden form submitted after successful payment -->
+          <form id="place-order-form" action="/orders/place" method="POST" style="display:none">
+            <input type="hidden" name="address"         id="form-address">
+            <input type="hidden" name="total"           value="<%=total%>">
+            <input type="hidden" name="paymentMethod"   id="form-payment-method">
+            <input type="hidden" name="paymentRef"      id="form-payment-ref">
+          </form>
+
+        </div><!-- /.payment-body -->
+      </div><!-- /.payment-card -->
+    </div><!-- /.payment-wrapper -->
+  </main>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+let activeTab = 'momo';
+
+function selectTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.method-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('section-' + tab).classList.add('visible');
+}
+
+function showStatus(id, type, html) {
+  const el = document.getElementById(id);
+  el.className = 'status-box show ' + type;
+  el.innerHTML = html;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function getAddress() {
+  return document.getElementById('delivery-address').value.trim();
+}
+
+function submitOrder(address, method, ref) {
+  document.getElementById('form-address').value = address;
+  document.getElementById('form-payment-method').value = method;
+  document.getElementById('form-payment-ref').value = ref;
+  document.getElementById('place-order-form').submit();
+}
+
+// ── Mobile Money ──
+async function payMobileMoney() {
+  const phone   = document.getElementById('phone-number').value.trim();
+  const network = document.getElementById('network-select').value;
+  const address = getAddress();
+  const amount  = '<%=total%>';
+
+  if (!address) { showStatus('momo-status','error','⚠ Please enter your delivery address.'); return; }
+  if (!phone)   { showStatus('momo-status','error','⚠ Please enter your phone number.'); return; }
+  if (!phone.startsWith('+')) { showStatus('momo-status','error','⚠ Use international format, e.g. +250788000000'); return; }
+
+  const btn = document.getElementById('pay-momo-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending payment request…';
+  showStatus('momo-status','pending','⏳ Contacting Africa\'s Talking…');
+
+  try {
+    const res  = await fetch('/payment/mobile-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, network, amount, address })
+    });
+    const data = await res.json();
+    console.log('[Payment response]', data);
+
+    // ── Server can't reach AT (dev environment / blocked) ──
+    if (data.blocked || data.error === 'AT_BLOCKED') {
+      showStatus('momo-status','warning',
+        '⚠️ <strong>Africa\'s Talking is unreachable from this server.</strong><br><br>' +
+        '📌 <strong>Why this happens:</strong> Your current server\'s network blocks outgoing calls to africastalking.com.<br><br>' +
+        '✅ <strong>Fix for production:</strong> Deploy to Render, Railway, or a VPS — AT works there.<br><br>' +
+        '🧪 <strong>Want to test now?</strong> Switch to the <strong>Demo / Test</strong> tab above to place a test order.'
+      );
+      btn.disabled = false;
+      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      return;
+    }
+
+    // ── AT config error (wrong username / product) ──
+    if (data.configError || data.error === 'AT_CONFIG') {
+      showStatus('momo-status','warning',
+        '⚙️ <strong>Africa\'s Talking configuration error:</strong><br>' + (data.message || data.error) + '<br><br>' +
+        'Fix: Open <code>routes/auth.js</code>, set <code>AT_USERNAME</code> to your AT app name and make sure the product "LuxeMarket" exists in your AT dashboard → Payments → Products.'
+      );
+      btn.disabled = false;
+      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      return;
+    }
+
+    // ── Live payment initiated ──
+    if (data.success && data.live) {
+      showStatus('momo-status','success',
+        '✅ <strong>Payment request sent to ' + phone + '!</strong><br>' +
+        'Check your phone and <strong>enter your PIN</strong> to confirm.<br>' +
+        '<small style="opacity:.75">Ref: ' + data.transactionId + '</small>'
+      );
+      btn.innerHTML = '⏳ Waiting for PIN confirmation…';
+      setTimeout(() => submitOrder(address, 'Mobile Money (' + network + ')', data.transactionId), 5000);
+      return;
+    }
+
+    // ── Generic error ──
+    showStatus('momo-status','error','⚠ ' + (data.error || data.message || 'Payment failed. Please try again.'));
+    btn.disabled = false;
+    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+
+  } catch(e) {
+    showStatus('momo-status','error','⚠ Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+  }
+}
+
+// ── PayPal ──
+function payPayPal() {
+  const address = getAddress();
+  if (!address) { showStatus('paypal-status','error','⚠ Please enter your delivery address first.'); return; }
+  showStatus('paypal-status','pending','⏳ Redirecting to PayPal…');
+  setTimeout(() => submitOrder(address, 'PayPal', 'PP-' + Date.now()), 1500);
+}
+
+// ── Demo / Test ──
+function payDemo() {
+  const address = getAddress();
+  if (!address) { showStatus('demo-status','error','⚠ Please enter your delivery address first.'); return; }
+  showStatus('demo-status','success','✅ Demo payment accepted! Placing your order…');
+  setTimeout(() => submitOrder(address, 'Demo / Test', 'DEMO-' + Date.now()), 1500);
+}
+</script>
+</body>
+</html>  async function payWithMobileMoney() {
+    const phone   = document.getElementById('phone-number').value.trim();
+    const network = document.getElementById('network-select').value;
+    const address = document.getElementById('delivery-address').value.trim();
+    const amount  = '<%=total%>';
+
+    if (!phone)   { showStatus('mobile-status','error','Please enter your phone number.'); return; }
+    if (!address) { showStatus('mobile-status','error','Please enter your delivery address.'); return; }
+    if (!phone.startsWith('+')) { showStatus('mobile-status','error','Use international format e.g. +250788000000'); return; }
+
+    const btn = document.getElementById('pay-mobile-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Sending payment request...';
+    showStatus('mobile-status','pending','Contacting PawaPay — sending prompt to ' + phone + '...');
+
+    try {
+      const res  = await fetch('/payment/mobile-checkout', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ phone, network, amount, address })
+      });
+      const data = await res.json();
+      console.log('Payment response:', data);
+
+      if (data.success) {
+        if (data.demo) {
+          showStatus('mobile-status','pending',
+            '<strong>Demo mode</strong> — PawaPay is blocked on this server network.<br>' +
+            'Once deployed to Railway/Render, real mobile money will work.<br>' +
+            '<small>Order will be placed now. Ref: ' + data.transactionId + '</small>');
+          btn.innerHTML = '<span class="spinner"></span> Placing order...';
+          setTimeout(() => submitOrder(address, network, data.transactionId), 2000);
+        } else {
+          // Live payment - poll for completion
+          showStatus('mobile-status','success',
+            '✅ <strong>Payment prompt sent to ' + phone + '!</strong><br>' +
+            'Open your phone, check for the ' + network + ' payment request, and enter your PIN.<br>' +
+            '<small>Transaction ID: ' + data.transactionId + '</small>');
+          btn.innerHTML = '<span class="spinner"></span> Waiting for PIN confirmation...';
+          pollPaymentStatus(data.transactionId, address, network, 0);
+        }
+      } else {
+        showStatus('mobile-status','error', data.error || 'Payment failed. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money &rarr;';
+      }
+    } catch(e) {
+      showStatus('mobile-status','error','Network error. Please check your connection and try again.');
+      btn.disabled = false;
+      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money &rarr;';
+    }
+  }
+
+  async function pollPaymentStatus(depositId, address, network, attempts) {
+    if (attempts > 12) { // 2 min max
+      showStatus('mobile-status','error','Payment confirmation timed out. If you entered your PIN, the order may still process. Contact support with ref: ' + depositId);
+      document.getElementById('pay-mobile-btn').disabled = false;
+      return;
+    }
+    try {
+      const r    = await fetch('/payment/status/' + depositId);
+      const data = await r.json();
+      console.log('Poll attempt', attempts, 'status:', data.status);
+      if (data.status === 'COMPLETED') {
+        showStatus('mobile-status','success','✅ Payment confirmed! Placing your order now...');
+        document.getElementById('pay-mobile-btn').innerHTML = '<span class="spinner"></span> Placing order...';
+        setTimeout(() => submitOrder(address, network, depositId), 1000);
+      } else if (data.status === 'FAILED' || data.status === 'EXPIRED') {
+        showStatus('mobile-status','error','Payment ' + data.status.toLowerCase() + '. Please try again.');
+        document.getElementById('pay-mobile-btn').disabled = false;
+        document.getElementById('pay-mobile-btn').innerHTML = '📱 Pay $<%=total%> with Mobile Money &rarr;';
+      } else {
+        setTimeout(() => pollPaymentStatus(depositId, address, network, attempts + 1), 10000);
+      }
+    } catch(e) {
+      setTimeout(() => pollPaymentStatus(depositId, address, network, attempts + 1), 10000);
+    }
+  }
+
+  function submitOrder(address, network, ref) {
+    document.getElementById('form-address').value = address;
+    document.getElementById('form-payment-method').value = 'Mobile Money (' + network + ')';
+    document.getElementById('form-payment-ref').value = ref;
+    document.getElementById('place-order-form').submit();
+  }
+.payment-card { background:rgba(255,255,255,0.97); border:2px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden; box-shadow:0 8px 40px rgba(58,173,164,0.18); }
+.payment-header { background:linear-gradient(135deg,#2a8f87,#3aada4); padding:2rem 2.2rem 1.8rem; color:#fff; }
+.payment-header h2 { font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:700; margin-bottom:0.2rem; }
+.payment-header p { opacity:.85; font-size:.95rem; }
+.payment-total-badge { background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.35); border-radius:14px; padding:.9rem 1.4rem; margin-top:1.2rem; display:inline-block; }
+.payment-total-badge .label { font-size:.78rem; opacity:.8; text-transform:uppercase; letter-spacing:.06em; }
+.payment-total-badge .amount { font-size:2.2rem; font-weight:800; font-family:'Playfair Display',serif; line-height:1; }
+.payment-body { padding:2rem 2.2rem; }
+.method-tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.8rem; margin-bottom:1.8rem; }
+.method-tab { border:2.5px solid var(--border2); border-radius:var(--radius); padding:1.1rem .8rem; background:#fff; cursor:pointer; text-align:center; transition:all .2s; }
+.method-tab:hover, .method-tab.active { border-color:var(--teal-dark); background:var(--teal-bg); transform:translateY(-2px); box-shadow:0 4px 16px rgba(58,173,164,.18); }
+.method-tab .mt-icon { font-size:1.8rem; margin-bottom:.4rem; }
+.method-tab .mt-name { font-weight:700; font-size:.88rem; color:var(--ink); }
+.method-tab .mt-sub  { font-size:.75rem; color:var(--muted); }
+.pay-section { display:none; }
+.pay-section.visible { display:block; }
+.status-box { border-radius:var(--radius); padding:1rem 1.2rem; margin-top:1rem; font-size:.93rem; font-weight:500; display:none; line-height:1.6; }
+.status-box.show { display:block; }
+.status-box.info    { background:rgba(58,173,164,.1);  border:1.5px solid rgba(58,173,164,.3);  color:#1a6b63; }
+.status-box.pending { background:rgba(221,208,106,.15); border:1.5px solid rgba(184,168,48,.4);  color:#7a6e10; }
+.status-box.success { background:rgba(46,158,122,.12); border:1.5px solid rgba(46,158,122,.35); color:#1e7a5a; }
+.status-box.error   { background:rgba(217,79,67,.09);  border:1.5px solid rgba(217,79,67,.3);   color:#b03328; }
+.status-box.warning { background:rgba(251,191,36,.1);  border:1.5px solid rgba(251,191,36,.4);  color:#92640a; }
+.btn-pay { width:100%; padding:1rem; background:linear-gradient(135deg,var(--teal-dark),#1a6b63); color:#fff; border:none; border-radius:var(--radius); font-family:'Outfit',sans-serif; font-size:1.05rem; font-weight:700; cursor:pointer; transition:all .2s; margin-top:1rem; box-shadow:0 4px 16px rgba(58,173,164,.3); }
+.btn-pay:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(58,173,164,.4); }
+.btn-pay:disabled { opacity:.6; cursor:not-allowed; }
+.btn-demo { background:transparent; border:2px solid var(--teal-dark); color:var(--teal-dark); padding:.75rem 1.5rem; border-radius:var(--radius); font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:700; cursor:pointer; width:100%; margin-top:.6rem; transition:all .2s; }
+.btn-demo:hover { background:var(--teal-bg); }
+.order-mini { background:var(--teal-bg); border:1.5px solid var(--border2); border-radius:var(--radius); padding:1rem 1.2rem; margin-bottom:1.5rem; }
+.order-mini .row { display:flex; justify-content:space-between; font-size:.88rem; padding:.22rem 0; color:var(--ink2); }
+.order-mini .row.total { border-top:1.5px solid var(--border); margin-top:.5rem; padding-top:.6rem; font-weight:700; font-size:1rem; color:var(--ink); }
+.spinner { display:inline-block; width:15px; height:15px; border:2.5px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; vertical-align:middle; margin-right:5px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.info-banner { background:rgba(251,191,36,.1); border:1.5px solid rgba(251,191,36,.35); border-radius:10px; padding:.9rem 1.1rem; font-size:.85rem; color:#7a5a00; margin-bottom:1.2rem; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-buyer">Buyer</div>
+    <div class="sidebar-section-label">Shop</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">🏠</span>Browse Shop</a></li>
+      <li><a href="/cart"><span class="nav-icon">🛒</span>My Cart</a></li>
+      <li><a href="/orders"><span class="nav-icon">📋</span>My Orders</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>🛍️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="marquee-wrapper"><div class="marquee-track">
+      <span>Secure Checkout</span><span>Mobile Money</span><span>Fast & Safe</span><span>Luxe Market</span><span>Protected Purchase</span>
+      <span>Secure Checkout</span><span>Mobile Money</span><span>Fast & Safe</span><span>Luxe Market</span><span>Protected Purchase</span>
+    </div></div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <div class="page-header">
+      <div class="page-header-left"><h1>💳 Secure Checkout</h1><p>Complete payment to place your order</p></div>
+      <a href="/cart" class="btn-secondary">← Back to Cart</a>
+    </div>
+
+    <div class="payment-wrapper">
+      <div class="payment-card">
+
+        <div class="payment-header">
+          <h2>Payment</h2>
+          <p>Choose your payment method and complete your order</p>
+          <div class="payment-total-badge">
+            <div class="label">Order Total</div>
+            <div class="amount">$<%=total%></div>
+          </div>
+        </div>
+
+        <div class="payment-body">
+
+          <!-- Order Summary -->
+          <div class="order-mini">
+            <div style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Order Summary</div>
+            <%cartItems.forEach(item=>{%>
+            <div class="row"><span><%=item.name%> ×<%=item.quantity%></span><span>$<%=(item.price*item.quantity).toFixed(2)%></span></div>
+            <%});%>
+            <div class="row total"><span>Total</span><span>$<%=total%></span></div>
+          </div>
+
+          <!-- Delivery Address -->
+          <div class="field" style="margin-bottom:1.5rem">
+            <label>Delivery Address</label>
+            <div class="input-wrap">
+              <span class="icon">📍</span>
+              <input type="text" id="delivery-address" placeholder="Enter your full delivery address" required>
+            </div>
+          </div>
+
+          <!-- Payment Method Tabs -->
+          <div style="margin-bottom:1.5rem">
+            <label style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:.8rem">Payment Method</label>
+            <div class="method-tabs">
+              <div class="method-tab active" onclick="selectTab('momo',this)">
+                <div class="mt-icon">📱</div>
+                <div class="mt-name">Mobile Money</div>
+                <div class="mt-sub">MTN · Airtel · M-Pesa</div>
+              </div>
+              <div class="method-tab" onclick="selectTab('paypal',this)">
+                <div class="mt-icon">🅿️</div>
+                <div class="mt-name">PayPal</div>
+                <div class="mt-sub">Pay with PayPal</div>
+              </div>
+              <div class="method-tab" onclick="selectTab('demo',this)">
+                <div class="mt-icon">🧪</div>
+                <div class="mt-name">Demo / Test</div>
+                <div class="mt-sub">Test order flow</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Money Section -->
+          <div class="pay-section visible" id="section-momo">
+            <div class="field">
+              <label>Phone Number</label>
+              <div class="input-wrap">
+                <span class="icon">📞</span>
+                <input type="tel" id="phone-number" placeholder="+250788000000  (international format)">
+              </div>
+            </div>
+            <div class="field">
+              <label>Mobile Network</label>
+              <div class="input-wrap">
+                <span class="icon">📶</span>
+                <select id="network-select" style="padding-left:2.9rem">
+                  <option value="MTN" selected>MTN Mobile Money (Rwanda/Uganda)</option>
+                  <option value="Airtel">Airtel Money (Rwanda/Uganda)</option>
+                  <option value="Mpesa">M-Pesa (Kenya)</option>
+                  <option value="Tigo">Tigo Pesa (Tanzania)</option>
+                  <option value="Vodacom">Vodacom M-Pesa (Tanzania)</option>
+                </select>
+              </div>
+            </div>
+            <div style="background:rgba(58,173,164,.07);border:1.5px solid rgba(58,173,164,.2);border-radius:10px;padding:.9rem 1.1rem;font-size:.87rem;color:var(--muted);margin:.5rem 0">
+              💡 You will receive a prompt on your phone. Enter your PIN to confirm.
+            </div>
+            <button class="btn-pay" id="pay-momo-btn" onclick="payMobileMoney()">
+              📱 Pay $<%=total%> with Mobile Money →
+            </button>
+            <div class="status-box" id="momo-status"></div>
+          </div>
+
+          <!-- PayPal Section -->
+          <div class="pay-section" id="section-paypal">
+            <div style="background:rgba(0,48,135,.05);border:1.5px solid rgba(0,48,135,.15);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem">
+              <div style="font-size:3rem;margin-bottom:.5rem">🅿️</div>
+              <div style="font-weight:700;color:#003087;font-size:1.05rem;margin-bottom:.3rem">Pay with PayPal</div>
+              <div style="font-size:.87rem;color:var(--muted)">You'll complete payment securely via PayPal.</div>
+            </div>
+            <button class="btn-pay" style="background:linear-gradient(135deg,#003087,#009cde)" onclick="payPayPal()">
+              🅿️ Pay $<%=total%> with PayPal →
+            </button>
+            <div class="status-box" id="paypal-status"></div>
+          </div>
+
+          <!-- Demo / Test Section -->
+          <div class="pay-section" id="section-demo">
+            <div class="info-banner">
+              ℹ️ <strong>Demo / Test Mode</strong><br>
+              Use this to test the full order flow without a real payment. Your order will be placed and you can see it under "My Orders".<br>
+              <small>No money is charged. For real payments, switch to Mobile Money or PayPal above.</small>
+            </div>
+            <button class="btn-pay" style="background:linear-gradient(135deg,#6b7280,#374151)" onclick="payDemo()">
+              🧪 Place Demo Order (No Charge) →
+            </button>
+            <div class="status-box" id="demo-status"></div>
+          </div>
+
+          <!-- Hidden form submitted after successful payment -->
+          <form id="place-order-form" action="/orders/place" method="POST" style="display:none">
+            <input type="hidden" name="address"         id="form-address">
+            <input type="hidden" name="total"           value="<%=total%>">
+            <input type="hidden" name="paymentMethod"   id="form-payment-method">
+            <input type="hidden" name="paymentRef"      id="form-payment-ref">
+          </form>
+
+        </div><!-- /.payment-body -->
+      </div><!-- /.payment-card -->
+    </div><!-- /.payment-wrapper -->
+  </main>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+let activeTab = 'momo';
+
+function selectTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.method-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('section-' + tab).classList.add('visible');
+}
+
+function showStatus(id, type, html) {
+  const el = document.getElementById(id);
+  el.className = 'status-box show ' + type;
+  el.innerHTML = html;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function getAddress() {
+  return document.getElementById('delivery-address').value.trim();
+}
+
+function submitOrder(address, method, ref) {
+  document.getElementById('form-address').value = address;
+  document.getElementById('form-payment-method').value = method;
+  document.getElementById('form-payment-ref').value = ref;
+  document.getElementById('place-order-form').submit();
+}
+
+// ── Mobile Money ──
+async function payMobileMoney() {
+  const phone   = document.getElementById('phone-number').value.trim();
+  const network = document.getElementById('network-select').value;
+  const address = getAddress();
+  const amount  = '<%=total%>';
+
+  if (!address) { showStatus('momo-status','error','⚠ Please enter your delivery address.'); return; }
+  if (!phone)   { showStatus('momo-status','error','⚠ Please enter your phone number.'); return; }
+  if (!phone.startsWith('+')) { showStatus('momo-status','error','⚠ Use international format, e.g. +250788000000'); return; }
+
+  const btn = document.getElementById('pay-momo-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending payment request…';
+  showStatus('momo-status','pending','⏳ Contacting Africa\'s Talking…');
+
+  try {
+    const res  = await fetch('/payment/mobile-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, network, amount, address })
+    });
+    const data = await res.json();
+    console.log('[Payment response]', data);
+
+    // ── Server can't reach AT (dev environment / blocked) ──
+    if (data.blocked || data.error === 'AT_BLOCKED') {
+      showStatus('momo-status','warning',
+        '⚠️ <strong>Africa\'s Talking is unreachable from this server.</strong><br><br>' +
+        '📌 <strong>Why this happens:</strong> Your current server\'s network blocks outgoing calls to africastalking.com.<br><br>' +
+        '✅ <strong>Fix for production:</strong> Deploy to Render, Railway, or a VPS — AT works there.<br><br>' +
+        '🧪 <strong>Want to test now?</strong> Switch to the <strong>Demo / Test</strong> tab above to place a test order.'
+      );
+      btn.disabled = false;
+      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      return;
+    }
+
+    // ── AT config error (wrong username / product) ──
+    if (data.configError || data.error === 'AT_CONFIG') {
+      showStatus('momo-status','warning',
+        '⚙️ <strong>Africa\'s Talking configuration error:</strong><br>' + (data.message || data.error) + '<br><br>' +
+        'Fix: Open <code>routes/auth.js</code>, set <code>AT_USERNAME</code> to your AT app name and make sure the product "LuxeMarket" exists in your AT dashboard → Payments → Products.'
+      );
+      btn.disabled = false;
+      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      return;
+    }
+
+    // ── Live payment initiated ──
+    if (data.success && data.live) {
+      showStatus('momo-status','success',
+        '✅ <strong>Payment request sent to ' + phone + '!</strong><br>' +
+        'Check your phone and <strong>enter your PIN</strong> to confirm.<br>' +
+        '<small style="opacity:.75">Ref: ' + data.transactionId + '</small>'
+      );
+      btn.innerHTML = '⏳ Waiting for PIN confirmation…';
+      setTimeout(() => submitOrder(address, 'Mobile Money (' + network + ')', data.transactionId), 5000);
+      return;
+    }
+
+    // ── Generic error ──
+    showStatus('momo-status','error','⚠ ' + (data.error || data.message || 'Payment failed. Please try again.'));
+    btn.disabled = false;
+    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+
+  } catch(e) {
+    showStatus('momo-status','error','⚠ Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+  }
+}
+
+// ── PayPal ──
+function payPayPal() {
+  const address = getAddress();
+  if (!address) { showStatus('paypal-status','error','⚠ Please enter your delivery address first.'); return; }
+  showStatus('paypal-status','pending','⏳ Redirecting to PayPal…');
+  setTimeout(() => submitOrder(address, 'PayPal', 'PP-' + Date.now()), 1500);
+}
+
+// ── Demo / Test ──
+function payDemo() {
+  const address = getAddress();
+  if (!address) { showStatus('demo-status','error','⚠ Please enter your delivery address first.'); return; }
+  showStatus('demo-status','success','✅ Demo payment accepted! Placing your order…');
+  setTimeout(() => submitOrder(address, 'Demo / Test', 'DEMO-' + Date.now()), 1500);
+}
+</script>
+</body>
+</html>

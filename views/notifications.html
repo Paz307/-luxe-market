@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Notifications — Luxe Market</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-<%=user.role%>"><%=user.role.charAt(0).toUpperCase()+user.role.slice(1)%></div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">🏠</span>Dashboard</a></li>
+      <li><a href="/notifications" class="active"><span class="nav-icon">🔔</span>Notifications</a></li>
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>👤<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left"><h1>Notifications</h1><p><%=notifications.length%> notification<%=notifications.length!==1?'s':''%></p></div>
+      <%if(notifications.length>0){%>
+      <form action="/notifications/mark-all-read" method="POST">
+        <button class="btn-secondary" style="font-size:0.82rem;padding:0.55rem 1rem">✓ Mark all read</button>
+      </form>
+      <%}%>
+    </div>
+    <%if(notifications.length===0){%>
+    <div class="empty-state"><div class="empty-icon">🔔</div><h4>No notifications</h4><p>You're all caught up!</p></div>
+    <%}else{%>
+    <div class="card">
+      <div class="card-body">
+        <%notifications.forEach(n=>{%>
+        <div class="notif-item <%=!n.read?'notif-unread':''%>">
+          <div class="notif-icon <%=n.type==='order'?'order':n.type==='alert'?'alert':'notif'%>"><%=n.type==='order'?'🛒':n.type==='alert'?'⚠️':'📢'%></div>
+          <div class="notif-body">
+            <div class="notif-title"><%=n.title%></div>
+            <div class="notif-msg"><%=n.message%></div>
+            <div class="notif-time"><%=new Date(n.created_at).toLocaleString()%></div>
+          </div>
+        </div>
+        <%});%>
+      </div>
+    </div>
+    <%}%>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body></html>

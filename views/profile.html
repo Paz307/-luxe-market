@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>My Profile — Luxe Market</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-<%=user.role%>"><%=user.role.charAt(0).toUpperCase()+user.role.slice(1)%></div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">📊</span>Dashboard</a></li>
+      <li><a href="/profile" class="active"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>👤<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left"><h1>My Profile</h1><p>Manage your personal information.</p></div>
+    </div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+    <%if(typeof errors!=='undefined'&&errors.length>0){%><%errors.forEach(e=>{%><div class="flash error">⚠ <%=e.msg%></div><%});%><%}%>
+
+    <div class="profile-hero">
+      <label for="profile_picture_edit" style="cursor:pointer">
+        <div class="profile-big-avatar" title="Click to change photo">
+          <%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt="<%=user.full_name%>"><%}else{%><%=user.role==='admin'?'⚙️':user.role==='seller'?'🏪':'🛍️'%><%}%>
+        </div>
+      </label>
+      <div class="profile-hero-info" style="z-index:1">
+        <h2><%=user.full_name%></h2>
+        <div class="email"><%=user.email%></div>
+        <div style="margin-top:0.6rem"><span class="role-pill <%=user.role%>"><%=user.role.charAt(0).toUpperCase()+user.role.slice(1)%></span></div>
+        <div class="text-sm" style="margin-top:0.5rem">Member since <%=new Date(user.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})%></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="gap:1.5rem">
+      <!-- Edit Profile -->
+      <div class="card">
+        <div class="card-header"><h3>Edit Profile</h3></div>
+        <div class="card-body">
+          <form action="/profile/update" method="POST" enctype="multipart/form-data">
+            <div style="text-align:center;margin-bottom:1.2rem">
+              <div class="avatar-preview" id="avatar-preview-edit" style="width:80px;height:80px;border-radius:50%;background:rgba(201,168,76,0.1);border:2px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;margin:0 auto 0.8rem;cursor:pointer" onclick="document.getElementById('profile_picture_edit').click()">
+                <%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" style="width:100%;height:100%;object-fit:cover"><%}else{%>📷<%}%>
+              </div>
+              <input type="file" id="profile_picture_edit" name="profile_picture" accept="image/*" style="display:none">
+              <div class="text-sm">Click photo to change</div>
+            </div>
+            <div class="field"><label>Full Name</label><div class="input-wrap"><span class="icon">👤</span><input type="text" name="full_name" value="<%=user.full_name%>" required></div></div>
+            <div class="field"><label>Email</label><div class="input-wrap"><span class="icon">✉</span><input type="email" name="email" value="<%=user.email%>" required></div></div>
+            <button type="submit" class="btn-primary">Save Changes →</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-header"><h3>Change Password</h3></div>
+        <div class="card-body">
+          <form action="/profile/change-password" method="POST">
+            <div class="field"><label>Current Password</label><div class="input-wrap"><span class="icon">🔒</span><input type="password" name="current_password" placeholder="Current password" required></div></div>
+            <div class="field"><label>New Password</label><div class="input-wrap"><span class="icon">🔒</span><input type="password" name="password" id="password" placeholder="New password" required></div>
+              <div class="pwd-strength"><div class="pwd-bar"><div class="pwd-bar-fill"></div></div>
+                <div class="pwd-rules">
+                  <span class="pwd-rule" id="rule-length"><span class="check">○</span> 8+ chars</span>
+                  <span class="pwd-rule" id="rule-upper"><span class="check">○</span> Uppercase</span>
+                  <span class="pwd-rule" id="rule-lower"><span class="check">○</span> Lowercase</span>
+                  <span class="pwd-rule" id="rule-number"><span class="check">○</span> Number</span>
+                  <span class="pwd-rule" id="rule-special"><span class="check">○</span> Special</span>
+                </div>
+              </div>
+            </div>
+            <div class="field"><label>Confirm New Password</label><div class="input-wrap"><span class="icon">🔒</span><input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat new password" required></div>
+              <div id="confirm-feedback" style="font-size:0.76rem;margin-top:0.3rem;"></div>
+            </div>
+            <button type="submit" class="btn-primary">Update Password →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Info -->
+    <div class="card">
+      <div class="card-header"><h3>Account Information</h3></div>
+      <div class="card-body">
+        <div class="grid-4">
+          <div><div class="text-sm" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.68rem;color:rgba(255,255,255,0.25);margin-bottom:0.3rem">Full Name</div><div style="font-size:0.92rem;font-weight:500"><%=user.full_name%></div></div>
+          <div><div class="text-sm" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.68rem;color:rgba(255,255,255,0.25);margin-bottom:0.3rem">Email</div><div style="font-size:0.92rem;font-weight:500"><%=user.email%></div></div>
+          <div><div class="text-sm" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.68rem;color:rgba(255,255,255,0.25);margin-bottom:0.3rem">Role</div><span class="role-pill <%=user.role%>"><%=user.role%></span></div>
+          <div><div class="text-sm" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.68rem;color:rgba(255,255,255,0.25);margin-bottom:0.3rem">Last Login</div><div style="font-size:0.92rem"><%=user.last_login?new Date(user.last_login).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'First login'%></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body></html>

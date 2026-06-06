@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Cart — Luxe Market</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+.qty-control { display:flex; align-items:center; gap:0.4rem; margin-top:0.5rem; }
+.qty-btn {
+  width:30px; height:30px; border-radius:8px; border:2px solid var(--border2);
+  background:#fff; color:var(--teal-darker,#1a6b63); font-size:1.1rem; font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; line-height:1; padding:0;
+}
+.qty-btn:hover { background:var(--teal-bg); border-color:var(--teal-dark); }
+.qty-display {
+  min-width:38px; height:30px; border:2px solid var(--border2); border-radius:8px;
+  background:#fff; color:var(--ink); font-weight:700; font-size:0.97rem;
+  text-align:center; display:flex; align-items:center; justify-content:center;
+}
+.qty-saving { font-size:0.78rem; color:var(--teal-dark); margin-left:4px; display:none; }
+.cart-item { display:flex; align-items:center; gap:1.1rem; padding:1rem 0; border-bottom:1.5px solid var(--border); }
+.cart-item:last-child { border-bottom:none; }
+.cart-thumb { width:70px; height:70px; border-radius:10px; overflow:hidden; background:var(--bg2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:2rem; }
+.cart-thumb img { width:100%; height:100%; object-fit:cover; }
+.cart-info { flex:1; min-width:0; }
+.cart-name { font-weight:700; color:var(--ink); font-size:0.97rem; }
+.cart-price { color:var(--muted); font-size:0.85rem; margin-top:2px; }
+.cart-subtotal { font-weight:800; color:var(--gold-dark,#b8900e); font-size:1.05rem; min-width:70px; text-align:right; }
+.cart-remove { background:none; border:none; color:var(--muted2,#ccc); font-size:1.2rem; cursor:pointer; padding:4px 8px; border-radius:6px; transition:all 0.15s; }
+.cart-remove:hover { background:rgba(217,79,67,0.1); color:#d94f43; }
+</style>
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-buyer">Buyer</div>
+    <div class="sidebar-section-label">Shop</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">🏠</span>Browse Shop</a></li>
+      <li><a href="/cart" class="active"><span class="nav-icon">🛒</span>My Cart <%if(cartItems.length>0){%><span class="nav-badge"><%=cartItems.length%></span><%}%></a></li>
+      <li><a href="/orders"><span class="nav-icon">📋</span>My Orders</a></li>
+    </ul>
+    <div class="sidebar-section-label">Account</div>
+    <ul class="sidebar-nav">
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+      <li><a href="/notifications"><span class="nav-icon">🔔</span>Notifications</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>🛍️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left"><h1>My Cart 🛒</h1><p><span id="item-count"><%=cartItems.length%></span> item<%=cartItems.length!==1?'s':''%> in your cart</p></div>
+      <a href="/dashboard" class="btn-secondary">← Continue Shopping</a>
+    </div>
+
+    <%if(typeof flash_success!=='undefined'&&flash_success.length>0){%><div class="flash success">✓ <%=flash_success[0]%></div><%}%>
+    <%if(typeof flash_error!=='undefined'&&flash_error.length>0){%><div class="flash error">⚠ <%=flash_error[0]%></div><%}%>
+
+    <%if(cartItems.length===0){%>
+    <div class="empty-state"><div class="empty-icon">🛒</div><h4>Your cart is empty</h4><p>Browse our shop to find something you love.</p><br><a href="/dashboard" class="btn-secondary">Go Shopping</a></div>
+    <%}else{%>
+    <div style="display:grid;grid-template-columns:1fr 330px;gap:1.5rem;align-items:start">
+
+      <!-- Cart Items -->
+      <div class="card">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Cart Items</h3>
+          <span style="font-size:0.85rem;color:var(--muted)">Adjust quantities below</span>
+        </div>
+        <div class="card-body" id="cart-items-container">
+          <%cartItems.forEach(item=>{%>
+          <div class="cart-item" id="cart-row-<%=item.cartId%>">
+            <div class="cart-thumb"><%if(item.image){%><img src="/uploads/<%=item.image%>" alt=""><%}else{%>📦<%}%></div>
+            <div class="cart-info">
+              <div class="cart-name"><%=item.name%></div>
+              <div class="cart-price">$<%=item.price.toFixed(2)%> each</div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty('<%=item.cartId%>', <%=item.quantity%>, -1, <%=item.price%>)">−</button>
+                <div class="qty-display" id="qty-<%=item.cartId%>"><%=item.quantity%></div>
+                <button class="qty-btn" onclick="changeQty('<%=item.cartId%>', <%=item.quantity%>, +1, <%=item.price%>)">+</button>
+                <span class="qty-saving" id="saving-<%=item.cartId%>">✓ Saved</span>
+              </div>
+            </div>
+            <div class="cart-subtotal" id="sub-<%=item.cartId%>">$<%=(item.price*item.quantity).toFixed(2)%></div>
+            <form action="/cart/remove" method="POST" onsubmit="return confirmRemove()">
+              <input type="hidden" name="cartId" value="<%=item.cartId%>">
+              <button class="cart-remove" title="Remove item">✕</button>
+            </form>
+          </div>
+          <%});%>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div>
+        <div class="card">
+          <div class="card-header"><h3>Order Summary</h3></div>
+          <div class="card-body">
+            <div id="summary-lines">
+            <%cartItems.forEach(item=>{%>
+            <div class="flex-between mb-1" style="font-size:0.87rem" id="sumline-<%=item.cartId%>">
+              <span style="color:var(--muted)"><%=item.name%> <span id="sumqty-<%=item.cartId%>">×<%=item.quantity%></span></span>
+              <span id="sumamt-<%=item.cartId%>">$<%=(item.price*item.quantity).toFixed(2)%></span>
+            </div>
+            <%});%>
+            </div>
+            <div style="border-top:1.5px solid var(--border2);margin:1rem 0;padding-top:1rem" class="flex-between">
+              <strong>Total</strong>
+              <strong class="text-gold" style="font-size:1.2rem" id="grand-total">$<%=total%></strong>
+            </div>
+            <a href="/checkout" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-top:0.5rem">
+              💳 Proceed to Payment →
+            </a>
+            <div style="text-align:center;margin-top:0.8rem;font-size:0.8rem;color:var(--muted)">🔒 Secure checkout — Mobile Money & PayPal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%}%>
+  </main>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+// Store item prices for recalculation
+const itemPrices = {};
+<%cartItems.forEach(item=>{%>
+itemPrices['<%=item.cartId%>'] = <%=item.price%>;
+<%});%>
+
+let debounceTimers = {};
+
+function changeQty(cartId, currentQty, delta, price) {
+  const newQty = Math.max(1, currentQty + delta);
+  if (newQty === currentQty) return;
+
+  // Update display immediately
+  document.getElementById('qty-' + cartId).textContent = newQty;
+  const sub = (price * newQty).toFixed(2);
+  document.getElementById('sub-' + cartId).textContent = '$' + sub;
+  document.getElementById('sumqty-' + cartId).textContent = '×' + newQty;
+  document.getElementById('sumamt-' + cartId).textContent = '$' + sub;
+  recalcTotal();
+
+  // Update button onclick with new qty
+  const btns = document.getElementById('cart-row-' + cartId).querySelectorAll('.qty-btn');
+  btns[0].setAttribute('onclick', `changeQty('${cartId}', ${newQty}, -1, ${price})`);
+  btns[1].setAttribute('onclick', `changeQty('${cartId}', ${newQty}, +1, ${price})`);
+
+  // Debounce save to server
+  clearTimeout(debounceTimers[cartId]);
+  debounceTimers[cartId] = setTimeout(() => {
+    fetch('/cart/update', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ cartId, quantity: newQty })
+    }).then(r => r.json()).then(data => {
+      if (data.success) {
+        const saving = document.getElementById('saving-' + cartId);
+        saving.style.display = 'inline';
+        setTimeout(() => { saving.style.display = 'none'; }, 1500);
+      }
+    }).catch(console.error);
+  }, 400);
+}
+
+function recalcTotal() {
+  let total = 0;
+  document.querySelectorAll('[id^="sub-"]').forEach(el => {
+    total += parseFloat(el.textContent.replace('$','')) || 0;
+  });
+  document.getElementById('grand-total').textContent = '$' + total.toFixed(2);
+}
+
+function confirmRemove() {
+  return confirm('Remove this item from your cart?');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Add User — Luxe Market</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Luxe<span>.</span></div>
+    <div class="sidebar-role-badge badge-admin">Administrator</div>
+    <ul class="sidebar-nav">
+      <li><a href="/dashboard"><span class="nav-icon">📊</span>Overview</a></li>
+      <li><a href="/admin/users"><span class="nav-icon">👥</span>All Users</a></li>
+      <li><a href="/admin/add-user" class="active"><span class="nav-icon">➕</span>Add User</a></li>
+      <li><a href="/profile"><span class="nav-icon">👤</span>My Profile</a></li>
+    </ul>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%if(user.profile_picture){%><img src="/uploads/<%=user.profile_picture%>" alt=""><%}else{%>⚙️<%}%></div>
+      <div class="sidebar-user-info"><div class="name"><%=user.full_name%></div><div class="email"><%=user.email%></div></div>
+      <a href="/logout" class="sidebar-logout">⎋</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left"><h1>Add New User</h1><p>Create a user account directly as administrator.</p></div>
+      <a href="/dashboard" class="btn-secondary">← Back</a>
+    </div>
+    <%if(typeof errors!=='undefined'&&errors.length>0){%><%errors.forEach(e=>{%><div class="flash error">⚠ <%=e.msg%></div><%});%><%}%>
+    <div class="card" style="max-width:560px">
+      <div class="card-header"><h3>User Details</h3></div>
+      <div class="card-body">
+        <form action="/admin/add-user" method="POST" enctype="multipart/form-data">
+          <div class="avatar-upload" onclick="document.getElementById('profile_picture').click()">
+            <div class="avatar-preview" id="avatar-preview">🧑</div>
+            <div class="avatar-info"><strong>Upload Photo</strong><p>Optional · JPG, PNG</p></div>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display:none">
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>Full Name</label><div class="input-wrap"><span class="icon">👤</span><input type="text" name="full_name" placeholder="Full name" required></div></div>
+            <div class="field"><label>Email</label><div class="input-wrap"><span class="icon">✉</span><input type="email" name="email" placeholder="email@example.com" required></div></div>
+          </div>
+          <div class="field"><label>I am joining as</label></div>
+          <div class="role-selector">
+            <div class="role-option"><input type="radio" name="role" id="rb" value="buyer" checked><label for="rb"><span class="role-icon">🛍️</span>Buyer</label></div>
+            <div class="role-option"><input type="radio" name="role" id="rs" value="seller"><label for="rs"><span class="role-icon">🏪</span>Seller</label></div>
+            <div class="role-option"><input type="radio" name="role" id="ra" value="admin"><label for="ra"><span class="role-icon">⚙️</span>Admin</label></div>
+          </div>
+          <div class="field"><label>Password</label><div class="input-wrap"><span class="icon">🔒</span><input type="password" name="password" id="password" placeholder="Strong password" required></div>
+            <div class="pwd-strength"><div class="pwd-bar"><div class="pwd-bar-fill"></div></div>
+              <div class="pwd-rules">
+                <span class="pwd-rule" id="rule-length"><span class="check">○</span> 8+ chars</span>
+                <span class="pwd-rule" id="rule-upper"><span class="check">○</span> Uppercase</span>
+                <span class="pwd-rule" id="rule-lower"><span class="check">○</span> Lowercase</span>
+                <span class="pwd-rule" id="rule-number"><span class="check">○</span> Number</span>
+                <span class="pwd-rule" id="rule-special"><span class="check">○</span> Special</span>
+              </div>
+            </div>
+          </div>
+          <div class="field"><label>Confirm Password</label><div class="input-wrap"><span class="icon">🔒</span><input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat password" required></div>
+            <div id="confirm-feedback" style="font-size:0.76rem;margin-top:0.3rem;"></div>
+          </div>
+          <button type="submit" class="btn-primary">Create User →</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/app.js"></script>
+</body></html>

@@ -1,0 +1,103 @@
+{
+  "users": [
+    {
+      "id": "6273c158-572b-46d7-800b-0e60086c4211",
+      "full_name": "BENIMANA PATRICK",
+      "email": "benimanapatrick50@gmail.com",
+      "password": "$2b$12$RQV2zbwQkJoDsDQwRrLajOofWT7RetTNKbnxxD/Rp1chR0GATCpX.",
+      "role": "buyer",
+      "profile_picture": "67e438c5-51f0-4b1a-8222-f64d90499994.jpeg",
+      "created_at": "2026-06-06T18:33:18.703Z",
+      "last_login": "2026-06-06T18:33:22.867Z",
+      "password_last_updated": "2026-06-06T18:33:18.703Z",
+      "disabled": false
+    },
+    {
+      "id": "238c97e7-5661-42d6-9fe2-63abf713b7f4",
+      "full_name": "BENIMANA PATRICK",
+      "email": "benimanapatrick2@gmail.com",
+      "password": "$2b$12$12VSHHgN2bCNZdrAfANIkOF1Axxp85eCxuWOAxdM48DTGNLUD5Da2",
+      "role": "seller",
+      "profile_picture": "6450b506-713e-4571-ba53-7f688cfa7440.jpg",
+      "created_at": "2026-06-06T18:34:36.101Z",
+      "last_login": "2026-06-06T18:37:13.205Z",
+      "password_last_updated": "2026-06-06T18:34:36.101Z",
+      "disabled": false
+    },
+    {
+      "id": "ccb8266e-cf8b-42ac-9be4-6b474794102d",
+      "full_name": "MUGABO PATRICK",
+      "email": "benimanapatrick005@gmail.com",
+      "password": "$2b$12$ftSHwacdZ/ZNWXYilHb/CeGsZC5HHFY1QdNhcezRFiP8FLP1/5ZRC",
+      "role": "buyer",
+      "profile_picture": "59e9d4f4-a37c-4d0e-bc0f-26afa1933bd3.jpeg",
+      "created_at": "2026-06-06T18:36:10.023Z",
+      "last_login": "2026-06-06T18:37:06.184Z",
+      "password_last_updated": "2026-06-06T18:36:10.023Z",
+      "disabled": false
+    }
+  ],
+  "products": [
+    {
+      "id": "31c2eae2-e199-46ef-8b2f-c0e537c8d47c",
+      "name": "shoes",
+      "price": "20.00",
+      "description": "shoes",
+      "category": "Fashion",
+      "stock": "49",
+      "image": "df62b341-5205-471a-be1a-0e0525d2af6d.jpg",
+      "sellerId": "238c97e7-5661-42d6-9fe2-63abf713b7f4",
+      "created_at": "2026-06-06T18:35:05.190Z",
+      "disabled": false
+    }
+  ],
+  "cart": [],
+  "orders": [
+    {
+      "id": "ae05cfb4-e98b-415b-9574-5e6ebc9125a0",
+      "buyerId": "ccb8266e-cf8b-42ac-9be4-6b474794102d",
+      "sellerId": "238c97e7-5661-42d6-9fe2-63abf713b7f4",
+      "address": "kigali",
+      "total": "20.00",
+      "productNames": "shoes x1",
+      "items": [
+        {
+          "productId": "31c2eae2-e199-46ef-8b2f-c0e537c8d47c",
+          "quantity": 1,
+          "price": "20.00"
+        }
+      ],
+      "status": "delivered",
+      "created_at": "2026-06-06T18:36:46.772Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "2bd34a2b-d931-46d5-aa65-64e08ace6dd8",
+      "userId": "238c97e7-5661-42d6-9fe2-63abf713b7f4",
+      "title": "🛒 New Order!",
+      "message": "New order from MUGABO PATRICK: shoes x1 — $20.00",
+      "type": "order",
+      "read": false,
+      "created_at": "2026-06-06T18:36:46.773Z"
+    },
+    {
+      "id": "bd6fd533-a35d-4566-8f0e-b1c730c3056b",
+      "userId": "ccb8266e-cf8b-42ac-9be4-6b474794102d",
+      "title": "Order Confirmed!",
+      "message": "Your order #ae05cfb4 has been confirmed.",
+      "type": "order",
+      "read": false,
+      "created_at": "2026-06-06T18:37:16.798Z"
+    },
+    {
+      "id": "9d1e67c3-925a-43b7-babb-5f29a51d4b1d",
+      "userId": "ccb8266e-cf8b-42ac-9be4-6b474794102d",
+      "title": "Order Delivered!",
+      "message": "Your order #ae05cfb4 has been delivered!",
+      "type": "order",
+      "read": false,
+      "created_at": "2026-06-06T18:37:18.107Z"
+    }
+  ]
+}
