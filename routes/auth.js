@@ -631,6 +631,78 @@ router.post('/notifications/mark-all-read', requireAuth, (req, res) => {
   res.redirect('/notifications');
 });
 
+
+// ── Google OAuth ──────────────────────────────────────────
+const https = require('https');
+
+router.get('/auth/google', (req, res) => {
+  const params = new URLSearchParams({
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'offline',
+    prompt: 'select_account'
+  });
+  res.redirect('https://accounts.google.com/o/oauth2/v2/auth?' + params.toString());
+});
+
+router.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.redirect('/login');
+
+  try {
+    // Exchange code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code'
+      })
+    });
+    const tokenData = await tokenRes.json();
+
+    // Get user info
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + tokenData.access_token }
+    });
+    const googleUser = await userRes.json();
+
+    const { email, name, picture } = googleUser;
+    let user = db.get('users').find({ email }).value();
+
+    if (!user) {
+      // Create new buyer account
+      const now = new Date().toISOString();
+      user = {
+        id: uuidv4(), full_name: name, email,
+        password: null, role: 'buyer',
+        profile_picture: null, google_picture: picture,
+        created_at: now, last_login: now,
+        password_last_updated: now, disabled: false, verified: true
+      };
+      db.get('users').push(user).write();
+    }
+
+    if (user.disabled) {
+      req.flash('error', 'Your account has been disabled.');
+      return res.redirect('/login');
+    }
+
+    req.session.userId = user.id;
+    req.session.role = user.role;
+    db.get('users').find({ id: user.id }).assign({ last_login: new Date().toISOString() }).write();
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error('Google OAuth error:', err);
+    res.redirect('/login');
+  }
+});
+
 module.exports = router;
 
 // ═══════════════════════════
