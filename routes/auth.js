@@ -21,7 +21,8 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// Google OAuth Strategy
+// Google OAuth Strategy (only initialize if credentials are set)
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -65,6 +66,7 @@ passport.deserializeUser((id, done) => {
   const user = db.get('users').find({ id }).value();
   done(null, user);
 });
+} // end Google OAuth init
 
 // Google OAuth routes
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
