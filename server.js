@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
+const passport = require('passport');
 
 const app = express();
 
@@ -24,11 +25,13 @@ app.use(session({
 }));
 
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
 const routes = require('./routes/auth');
 app.use('/', routes);
 
-const PORT = process.env.PORT || 8080;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`\n✦ Luxe Market running at http://localhost:${PORT}\n`);
 });

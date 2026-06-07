@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
 
 // Admin secret code (set ADMIN_SECRET in Railway environment variables)
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'luxeadmin2024';
@@ -16,6 +19,70 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   }
 });
+
+
+// Google OAuth Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: '/auth/google/callback'
+}, (accessToken, refreshToken, profile, done) => {
+  const email = profile.emails[0].value;
+  const full_name = profile.displayName;
+  const google_id = profile.id;
+
+  let user = db.get('users').find({ email }).value();
+  if (!user) {
+    // Create new user
+    const { uuidv4 } = require('uuid');
+    user = {
+      id: require('uuid').v4(),
+      full_name,
+      email,
+      google_id,
+      password: null,
+      role: 'buyer',
+      profile_picture: null,
+      created_at: new Date().toISOString(),
+      last_login: new Date().toISOString(),
+      password_last_updated: new Date().toISOString(),
+      disabled: false,
+      verified: true
+    };
+    db.get('users').push(user).write();
+  } else {
+    // Update existing user with google_id if not set
+    if (!user.google_id) {
+      db.get('users').find({ email }).assign({ google_id }).write();
+    }
+    db.get('users').find({ email }).assign({ last_login: new Date().toISOString() }).write();
+  }
+  return done(null, user);
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((id, done) => {
+  const user = db.get('users').find({ id }).value();
+  done(null, user);
+});
+
+// Google OAuth routes
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    const user = req.user;
+    if (user.disabled) {
+      req.flash('error', 'Your account has been disabled.');
+      return res.redirect('/login');
+    }
+    req.session.userId = user.id;
+    req.session.role = user.role;
+    req.session.userName = user.full_name;
+    res.redirect('/dashboard');
+  }
+);
 
 // Store pending verifications in memory
 const pendingVerifications = {};
