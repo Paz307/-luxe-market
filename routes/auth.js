@@ -1,6 +1,25 @@
-const axios = require('axios');
 const express = require('express');
 const router = express.Router();
+
+const nodemailer = require('nodemailer');
+
+// Admin secret code (set ADMIN_SECRET in Railway environment variables)
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'luxeadmin2024';
+
+// Email transporter (Brevo SMTP)
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
+  port: parseInt(process.env.EMAIL_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Store pending verifications in memory
+const pendingVerifications = {};
+
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
@@ -757,7 +776,3 @@ router.post('/payment/callback/deposit', (req, res) => {
 
 router.post('/payment/callback/payout', (req, res) => { res.json({ received: true }); });
 router.post('/payment/callback/refund',  (req, res) => { res.json({ received: true }); });
-
-
-
-

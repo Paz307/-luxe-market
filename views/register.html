@@ -129,7 +129,6 @@
         <div class="role-selector">
           <div class="role-option"><input type="radio" name="role" id="role-buyer" value="buyer" checked><label for="role-buyer"><span class="role-icon">🛍️</span>Buyer</label></div>
           <div class="role-option"><input type="radio" name="role" id="role-seller" value="seller"><label for="role-seller"><span class="role-icon">🏪</span>Seller</label></div>
-          <div class="role-option"><input type="radio" name="role" id="role-admin" value="admin"><label for="role-admin"><span class="role-icon">⚙️</span>Admin</label></div>
         </div>
 
         <div class="field">
@@ -188,6 +187,16 @@
       setTimeout(() => sendWelcomeEmail(toEmail, toName), 300);
     }
   });
+  // Show admin registration if URL has ?role=admin
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('role') === 'admin') {
+    document.getElementById('admin-code-wrap').style.display = 'block';
+    const adminRadio = document.createElement('input');
+    adminRadio.type = 'hidden';
+    adminRadio.name = 'role';
+    adminRadio.value = 'admin';
+    document.getElementById('admin-code-wrap').appendChild(adminRadio);
+  }
 </script>
 </body>
 </html>

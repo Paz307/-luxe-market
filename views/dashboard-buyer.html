@@ -50,7 +50,7 @@
     <%if(products.length===0){%>
     <div class="empty-state"><div class="empty-icon">🛍️</div><h4>No products found</h4><p><%=search?'Try a different search term.':'Check back soon — sellers are adding products.'%></p></div>
     <%}else{%>
-    <div class="product-grid">
+    <div class="product-list-vertical">
       <%products.forEach(p=>{%>
       <div class="product-card">
         <div class="product-img"><%if(p.image){%><img src="/uploads/<%=p.image%>" alt="<%=p.name%>"><%}else{%>📦<%}%></div>

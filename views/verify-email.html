@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Email – Luxe Market</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg,#2a8f87,#81D8D0); }
+  .verify-card { background:#fff; border-radius:20px; padding:2.5rem 2rem; max-width:420px; width:100%; box-shadow:0 8px 40px rgba(0,0,0,0.12); text-align:center; }
+  .verify-icon { font-size:3rem; margin-bottom:1rem; }
+  .verify-title { font-size:1.6rem; font-weight:700; color:#1a1a1a; margin-bottom:0.5rem; }
+  .verify-sub { color:#666; margin-bottom:1.5rem; font-size:0.95rem; }
+  .code-inputs { display:flex; gap:0.5rem; justify-content:center; margin-bottom:1.5rem; }
+  .code-inputs input[type=text] { width:46px; height:56px; text-align:center; font-size:1.4rem; font-weight:700; border:2px solid #ddd; border-radius:10px; outline:none; transition:border 0.2s; }
+  .code-inputs input[type=text]:focus { border-color:#2a8f87; }
+  .btn-verify { width:100%; padding:0.9rem; background:#2a8f87; color:#fff; border:none; border-radius:10px; font-size:1rem; font-weight:600; cursor:pointer; }
+  .btn-verify:hover { background:#1a6b63; }
+  .flash-error { background:#fee; color:#c00; border-radius:8px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.9rem; }
+  .resend-link { margin-top:1rem; font-size:0.85rem; color:#888; }
+  .resend-link a { color:#2a8f87; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="verify-card">
+  <div class="verify-icon">📧</div>
+  <div class="verify-title">Check Your Email</div>
+  <div class="verify-sub">We sent a 6-digit code to <b><%=email%></b>. Enter it below to verify your account.</div>
+
+  <% if(flash_error && flash_error.length){ %>
+    <div class="flash-error"><%=flash_error[0]%></div>
+  <% } %>
+
+  <form action="/verify-email" method="POST" id="verify-form">
+    <input type="hidden" name="email" value="<%=email%>">
+    <input type="hidden" name="code" id="code-combined">
+    <div class="code-inputs">
+      <input type="text" maxlength="1" class="digit" autofocus>
+      <input type="text" maxlength="1" class="digit">
+      <input type="text" maxlength="1" class="digit">
+      <input type="text" maxlength="1" class="digit">
+      <input type="text" maxlength="1" class="digit">
+      <input type="text" maxlength="1" class="digit">
+    </div>
+    <button type="submit" class="btn-verify">Verify Email →</button>
+  </form>
+
+  <div class="resend-link">Didn't receive it? <a href="/register">Register again</a> or check your spam folder.</div>
+</div>
+
+<script>
+  const digits = document.querySelectorAll('.digit');
+  digits.forEach((input, i) => {
+    input.addEventListener('input', () => {
+      if (input.value && i < digits.length - 1) digits[i+1].focus();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && i > 0) digits[i-1].focus();
+    });
+  });
+  document.getElementById('verify-form').addEventListener('submit', () => {
+    document.getElementById('code-combined').value = Array.from(digits).map(d => d.value).join('');
+  });
+</script>
+</body>
+</html>
