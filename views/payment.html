@@ -88,7 +88,7 @@
           <p>Choose your payment method and complete your order</p>
           <div class="payment-total-badge">
             <div class="label">Order Total</div>
-            <div class="amount">$<%=total%></div>
+            <div class="amount">RWF <%=total%></div>
           </div>
         </div>
 
@@ -98,9 +98,9 @@
           <div class="order-mini">
             <div style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Order Summary</div>
             <%cartItems.forEach(item=>{%>
-            <div class="row"><span><%=item.name%> ×<%=item.quantity%></span><span>$<%=(item.price*item.quantity).toFixed(2)%></span></div>
+            <div class="row"><span><%=item.name%> ×<%=item.quantity%></span><span>RWF <%=(item.price*item.quantity).toFixed(0)%></span></div>
             <%});%>
-            <div class="row total"><span>Total</span><span>$<%=total%></span></div>
+            <div class="row total"><span>Total</span><span>RWF <%=total%></span></div>
           </div>
 
           <!-- Delivery Address -->
@@ -160,7 +160,7 @@
               💡 You will receive a prompt on your phone. Enter your PIN to confirm.
             </div>
             <button class="btn-pay" id="pay-momo-btn" onclick="payMobileMoney()">
-              📱 Pay $<%=total%> with Mobile Money →
+              📱 Pay RWF <%=total%> with Mobile Money →
             </button>
             <div class="status-box" id="momo-status"></div>
           </div>
@@ -173,7 +173,7 @@
               <div style="font-size:.87rem;color:var(--muted)">You'll complete payment securely via PayPal.</div>
             </div>
             <button class="btn-pay" style="background:linear-gradient(135deg,#003087,#009cde)" onclick="payPayPal()">
-              🅿️ Pay $<%=total%> with PayPal →
+              🅿️ Pay RWF <%=total%> with PayPal →
             </button>
             <div class="status-box" id="paypal-status"></div>
           </div>
@@ -205,6 +205,7 @@
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/app.js"></script>
 <script>
 let activeTab = 'momo';
@@ -263,13 +264,13 @@ async function payMobileMoney() {
     // ── Server can't reach AT (dev environment / blocked) ──
     if (data.blocked || data.error === 'AT_BLOCKED') {
       showStatus('momo-status','warning',
-        '⚠️ <strong>Pawapay is unreachable from this server.</strong><br><br>' +
+        '⚠️ <strong>Africa\'s Talking is unreachable from this server.</strong><br><br>' +
         '📌 <strong>Why this happens:</strong> Your current server\'s network blocks outgoing calls to africastalking.com.<br><br>' +
         '✅ <strong>Fix for production:</strong> Deploy to Render, Railway, or a VPS — AT works there.<br><br>' +
         '🧪 <strong>Want to test now?</strong> Switch to the <strong>Demo / Test</strong> tab above to place a test order.'
       );
       btn.disabled = false;
-      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      btn.innerHTML = '📱 Pay RWF ' + amount + ' with Mobile Money →';
       return;
     }
 
@@ -280,7 +281,7 @@ async function payMobileMoney() {
         'Fix: Open <code>routes/auth.js</code>, set <code>AT_USERNAME</code> to your AT app name and make sure the product "LuxeMarket" exists in your AT dashboard → Payments → Products.'
       );
       btn.disabled = false;
-      btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+      btn.innerHTML = '📱 Pay RWF ' + amount + ' with Mobile Money →';
       return;
     }
 
@@ -299,12 +300,12 @@ async function payMobileMoney() {
     // ── Generic error ──
     showStatus('momo-status','error','⚠ ' + (data.error || data.message || 'Payment failed. Please try again.'));
     btn.disabled = false;
-    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+    btn.innerHTML = '📱 Pay RWF ' + amount + ' with Mobile Money →';
 
   } catch(e) {
     showStatus('momo-status','error','⚠ Network error. Please check your connection and try again.');
     btn.disabled = false;
-    btn.innerHTML = '📱 Pay $' + amount + ' with Mobile Money →';
+    btn.innerHTML = '📱 Pay RWF ' + amount + ' with Mobile Money →';
   }
 }
 
