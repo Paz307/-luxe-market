@@ -777,7 +777,6 @@ module.exports = router;
 // ═══════════════════════════
 // PAYMENT CONFIG — Africa's Talking
 // ═══════════════════════════
-const https = require('https');
 const querystring = require('querystring');
 
 // ─── AT CREDENTIALS ─── Change AT_USERNAME to your real AT app name for production
